@@ -18,12 +18,19 @@
           {{ estudiante.nombre }} {{ estudiante.apellido }} (Cédula:
           {{ estudiante.cedula }})
         </router-link>
+        <button class="edit-button" @click="editarEstudiante(estudiante.url)">
+          Editar
+        </button>
+        <button
+          class="delete-button"
+          @click="eliminarEstudiante(estudiante.url)"
+        >
+          Eliminar
+        </button>
       </li>
     </ul>
     <p v-else>No hay estudiantes registrados.</p>
-    <router-link to="/estudiantes/nuevo" class="add-button"
-      >Agregar Nuevo Estudiante</router-link
-    >
+    <button class="add-button" disabled>Agregar Nuevo Estudiante</button>
   </div>
 </template>
 
@@ -58,7 +65,26 @@ export default {
         this.loading = false;
       }
     },
-    // Ya no necesitamos getEstudianteId() si pasamos la URL completa
+    editarEstudiante(estudianteUrl) {
+      this.$router.push({
+        name: "EditarEstudiante",
+        params: { estudianteUrl },
+      });
+    },
+    async eliminarEstudiante(estudianteUrl) {
+      if (confirm("¿Estás seguro de que deseas eliminar este estudiante?")) {
+        try {
+          await api.delete(estudianteUrl);
+          this.estudiantes = this.estudiantes.filter(
+            (est) => est.url !== estudianteUrl
+          );
+          alert("Estudiante eliminado con éxito.");
+        } catch (err) {
+          console.error("Error al eliminar estudiante:", err);
+          alert("No se pudo eliminar el estudiante.");
+        }
+      }
+    },
   },
 };
 </script>
@@ -115,10 +141,38 @@ ul {
   text-decoration: none;
   text-align: center;
   transition: background-color 0.3s ease;
+  cursor: not-allowed; /* Cambia el cursor para indicar que está deshabilitado */
 }
 
 .add-button:hover {
-  background-color: #218838;
+  background-color: #218838; /* Cambia el color al pasar el mouse, aunque esté deshabilitado */
+}
+
+.edit-button {
+  background-color: #28a745; /* Verde para el botón de editar */
+  color: white;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-left: 10px; /* Espacio entre botones */
+}
+
+.edit-button:hover {
+  background-color: #218838; /* Color más oscuro al pasar el mouse */
+}
+
+.delete-button {
+  background-color: #dc3545; /* Rojo para el botón de eliminar */
+  color: white;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.delete-button:hover {
+  background-color: #c82333; /* Color más oscuro al pasar el mouse */
 }
 
 .error-message {

@@ -1,8 +1,10 @@
 import { createRouter, createWebHistory } from "vue-router";
 import HomeView from "../views/HomeView.vue";
-import Login from "../views/Login.vue"; // Tu nuevo componente de login
-import EstudiantesList from "../views/EstudiantesList.vue"; // Tu nuevo componente de lista de estudiantes
-import EstudianteDetail from "../views/EstudianteDetail.vue"; // ¡Importa el nuevo componente!
+import Login from "../views/Login.vue"; // Componente de login
+import EstudiantesList from "../views/EstudiantesList.vue"; // Componente de lista de estudiantes
+import EstudianteDetail from "../views/EstudianteDetail.vue"; // Componente de detalle de estudiante
+import EditarEstudiante from "../views/EditarEstudiante.vue"; // Componente para editar estudiante
+import EditarTelefono from "../views/EditarTelefono.vue"; // Componente para editar número telefónico
 
 const routes = [
   {
@@ -19,13 +21,27 @@ const routes = [
     path: "/estudiantes",
     name: "EstudiantesList",
     component: EstudiantesList,
-    meta: { requiresAuth: true }, // Marca esta ruta como protegida
+    meta: { requiresAuth: true }, // Ruta protegida
   },
   {
-    path: "/estudiantes/detail/:estudianteUrl*", // <-- ¡Cambio clave aquí!
+    path: "/estudiantes/detail/:estudianteUrl", // Ruta para ver detalles de un estudiante
     name: "EstudianteDetail",
     component: EstudianteDetail,
-    props: true, // Esto pasa el ':id' como una prop al componente EstudianteDetail
+    props: true, // Pasa el ':estudianteUrl' como una prop al componente EstudianteDetail
+    meta: { requiresAuth: true },
+  },
+  {
+    path: "/estudiantes/editar/:estudianteUrl", // Ruta para editar un estudiante
+    name: "EditarEstudiante",
+    component: EditarEstudiante,
+    props: true, // Pasa el ':estudianteUrl' como una prop al componente EditarEstudiante
+    meta: { requiresAuth: true },
+  },
+  {
+    path: "/telefonos/editar/:telefonoUrl/:estudianteUrl", // Ruta para editar un número telefónico
+    name: "EditarTelefono",
+    component: EditarTelefono,
+    props: true, // Pasa el ':telefonoUrl' y ':estudianteUrl' como props al componente EditarTelefono
     meta: { requiresAuth: true },
   },
 ];
