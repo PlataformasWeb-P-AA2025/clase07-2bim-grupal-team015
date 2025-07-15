@@ -4,18 +4,20 @@
     <p v-if="loading">Cargando datos...</p>
     <p v-if="error" class="error-message">{{ error }}</p>
     <form v-else @submit.prevent="updateTelefono">
-      <div>
+      <div class="form-group">
         <label for="telefono">Número:</label>
         <input type="text" v-model="telefono.telefono" required />
       </div>
-      <div>
+      <div class="form-group">
         <label for="tipo">Tipo:</label>
         <input type="text" v-model="telefono.tipo" required />
       </div>
-      <button type="submit" class="update-button">Actualizar Número</button>
-      <button type="button" class="delete-button" @click="eliminarTelefono">
-        Eliminar Número
-      </button>
+      <div class="button-group">
+        <button type="submit" class="update-button">Actualizar Número</button>
+        <button type="button" class="delete-button" @click="eliminarTelefono">
+          Eliminar Número
+        </button>
+      </div>
     </form>
     <router-link
       :to="{
@@ -111,6 +113,30 @@ h2 {
   margin-top: 10px;
 }
 
+.form-group {
+  margin-bottom: 15px;
+}
+
+label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+.button-group {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
 .back-button {
   display: block;
   width: fit-content;
@@ -135,7 +161,6 @@ h2 {
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  margin-right: 10px; /* Espacio entre botones */
 }
 
 .update-button:hover {

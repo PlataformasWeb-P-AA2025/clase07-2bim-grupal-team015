@@ -14,23 +14,34 @@
             name: 'EstudianteDetail',
             params: { estudianteUrl: estudiante.url },
           }"
+          class="estudiante-link"
         >
           {{ estudiante.nombre }} {{ estudiante.apellido }} (Cédula:
           {{ estudiante.cedula }})
         </router-link>
-        <button class="edit-button" @click="editarEstudiante(estudiante.url)">
-          Editar
-        </button>
-        <button
-          class="delete-button"
-          @click="eliminarEstudiante(estudiante.url)"
-        >
-          Eliminar
-        </button>
+        <div class="button-group">
+          <button class="edit-button" @click="editarEstudiante(estudiante.url)">
+            Editar
+          </button>
+          <button
+            class="delete-button"
+            @click="eliminarEstudiante(estudiante.url)"
+          >
+            Eliminar
+          </button>
+          <router-link
+            :to="{ name: 'AgregarTelefono' }"
+            class="add-phone-button"
+          >
+            Agregar Teléfono
+          </router-link>
+        </div>
       </li>
     </ul>
     <p v-else>No hay estudiantes registrados.</p>
-    <button class="add-button" disabled>Agregar Nuevo Estudiante</button>
+    <router-link to="/estudiantes/nuevo" class="add-button">
+      Agregar Nuevo Estudiante
+    </router-link>
   </div>
 </template>
 
@@ -112,22 +123,31 @@ ul {
 }
 
 .estudiante-item {
-  padding: 10px 0;
+  padding: 15px;
   border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .estudiante-item:last-child {
   border-bottom: none;
 }
 
-.estudiante-item a {
+.estudiante-link {
   text-decoration: none;
   color: #007bff;
   font-weight: bold;
+  flex-grow: 1; /* Permite que el enlace ocupe el espacio disponible */
 }
 
-.estudiante-item a:hover {
+.estudiante-link:hover {
   text-decoration: underline;
+}
+
+.button-group {
+  display: flex;
+  gap: 10px; /* Espacio entre los botones */
 }
 
 .add-button {
@@ -141,11 +161,10 @@ ul {
   text-decoration: none;
   text-align: center;
   transition: background-color 0.3s ease;
-  cursor: not-allowed; /* Cambia el cursor para indicar que está deshabilitado */
 }
 
 .add-button:hover {
-  background-color: #218838; /* Cambia el color al pasar el mouse, aunque esté deshabilitado */
+  background-color: #218838; /* Cambia el color al pasar el mouse */
 }
 
 .edit-button {
@@ -155,7 +174,6 @@ ul {
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  margin-left: 10px; /* Espacio entre botones */
 }
 
 .edit-button:hover {
@@ -173,6 +191,19 @@ ul {
 
 .delete-button:hover {
   background-color: #c82333; /* Color más oscuro al pasar el mouse */
+}
+
+.add-phone-button {
+  background-color: #007bff; /* Azul para el botón de agregar teléfono */
+  color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
+  text-decoration: none;
+  transition: background-color 0.3s;
+}
+
+.add-phone-button:hover {
+  background-color: #0056b3; /* Color más oscuro al pasar el mouse */
 }
 
 .error-message {

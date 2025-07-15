@@ -5,6 +5,8 @@ import EstudiantesList from "../views/EstudiantesList.vue"; // Componente de lis
 import EstudianteDetail from "../views/EstudianteDetail.vue"; // Componente de detalle de estudiante
 import EditarEstudiante from "../views/EditarEstudiante.vue"; // Componente para editar estudiante
 import EditarTelefono from "../views/EditarTelefono.vue"; // Componente para editar número telefónico
+import AgregarEstudiante from "../views/AgregarEstudiante.vue"; // Componente para agregar estudiante
+import AgregarTelefono from "../views/AgregarTelefono.vue"; // Componente para agregar número de teléfono
 
 const routes = [
   {
@@ -42,6 +44,18 @@ const routes = [
     name: "EditarTelefono",
     component: EditarTelefono,
     props: true, // Pasa el ':telefonoUrl' y ':estudianteUrl' como props al componente EditarTelefono
+    meta: { requiresAuth: true },
+  },
+  {
+    path: "/estudiantes/nuevo", // Ruta para agregar un nuevo estudiante
+    name: "AgregarEstudiante",
+    component: AgregarEstudiante,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: "/telefonos/nuevo", // Ruta para agregar un nuevo número de teléfono
+    name: "AgregarTelefono",
+    component: AgregarTelefono,
     meta: { requiresAuth: true },
   },
 ];

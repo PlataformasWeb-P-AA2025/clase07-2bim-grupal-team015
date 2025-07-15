@@ -9,15 +9,6 @@
       <p><strong>Cédula:</strong> {{ estudiante.cedula }}</p>
       <p><strong>Correo:</strong> {{ estudiante.correo }}</p>
 
-      <div class="estudiante-actions">
-        <button class="edit-button" @click="editarEstudiante">
-          Editar Estudiante
-        </button>
-        <button class="delete-button" @click="eliminarEstudiante">
-          Eliminar Estudiante
-        </button>
-      </div>
-
       <h4>Números Telefónicos:</h4>
       <div v-if="numerosTelefonicos.length" class="telefonos-list">
         <div
