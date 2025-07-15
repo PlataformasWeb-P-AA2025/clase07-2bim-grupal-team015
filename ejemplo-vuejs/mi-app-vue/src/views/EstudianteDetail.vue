@@ -1,27 +1,38 @@
 <template>
   <div class="estudiante-detail-container">
     <h2>Detalle del Estudiante</h2>
+
     <p v-if="loading">Cargando detalles...</p>
     <p v-if="error" class="error-message">{{ error }}</p>
 
-    <div v-if="estudiante" class="estudiante-info">
+    <div v-if="estudiante && !loading" class="estudiante-info">
       <h3>{{ estudiante.nombre }} {{ estudiante.apellido }}</h3>
       <p><strong>Cédula:</strong> {{ estudiante.cedula }}</p>
       <p><strong>Correo:</strong> {{ estudiante.correo }}</p>
 
+      <div class="estudiante-actions">
+        <button class="edit-button" @click="editarEstudiante">
+          Editar Estudiante
+        </button>
+        <button class="delete-button" @click="eliminarEstudiante">
+          Eliminar Estudiante
+        </button>
+      </div>
+
       <h4>Números Telefónicos:</h4>
-      <div v-if="numerosTelefonicos.length" class="telefonos-list">
+
+      <div v-if="numerosTelefonicos.length > 0" class="telefonos-list">
         <div
-          v-for="numero in numerosTelefonicos"
-          :key="numero.url"
+          v-for="telefono in numerosTelefonicos"
+          :key="telefono.id"
           class="telefono-item"
         >
-          <p>{{ numero.telefono }} ({{ numero.tipo }})</p>
+          <p>{{ telefono.telefono }} ({{ telefono.tipo }})</p>
           <div class="telefono-actions">
-            <button class="small-edit" @click="editarTelefono(numero.url)">
+            <button class="small-edit" @click="editarTelefono(telefono.id)">
               Editar Teléfono
             </button>
-            <button class="small-delete" @click="eliminarTelefono(numero.url)">
+            <button class="small-delete" @click="eliminarTelefono(telefono.id)">
               Eliminar Teléfono
             </button>
           </div>
@@ -33,6 +44,7 @@
         Volver al Listado
       </router-link>
     </div>
+
     <p v-else-if="!loading">Estudiante no encontrado.</p>
   </div>
 </template>
@@ -42,66 +54,109 @@ import api from "@/api/axios";
 
 export default {
   name: "EstudianteDetail",
-  props: ["estudianteUrl"],
+  props: {
+    estudianteUrl: {
+      type: String,
+      required: true,
+    },
+  },
   data() {
     return {
       estudiante: null,
       numerosTelefonicos: [],
-      loading: true,
+      loading: false,
       error: null,
     };
   },
-  async created() {
-    try {
-      // Cargar datos del estudiante
-      const decodedUrl = decodeURIComponent(this.estudianteUrl);
-      const estudianteResponse = await api.get(decodedUrl);
-      this.estudiante = estudianteResponse.data;
-
-      // Cargar números telefónicos
-      const telefonosResponse = await api.get("numerosts/");
-      this.numerosTelefonicos = telefonosResponse.data.results.filter(
-        (t) => t.estudiante === decodedUrl
-      );
-    } catch (err) {
-      this.error =
-        "Error al cargar los datos del estudiante o números telefónicos.";
-    } finally {
-      this.loading = false;
-    }
+  watch: {
+    estudianteUrl: {
+      immediate: true,
+      handler() {
+        this.cargarDatos();
+      },
+    },
   },
   methods: {
+    async cargarDatos() {
+      this.loading = true;
+      this.error = null;
+      try {
+        const decodedUrl = decodeURIComponent(this.estudianteUrl);
+
+        // Obtener datos del estudiante
+        const respEstudiante = await api.get(decodedUrl);
+        this.estudiante = respEstudiante.data;
+
+        // Obtener teléfonos
+        const respTelefonos = await api.get("numerosts/");
+
+        // Extraer ID del estudiante de la URL (último segmento)
+        const partes = decodedUrl.split("/").filter(Boolean);
+        const estudianteId = partes[partes.length - 1];
+
+        // Filtrar teléfonos del estudiante y extraer id del teléfono de la URL
+        this.numerosTelefonicos = respTelefonos.data.results
+          .filter((t) => t.estudiante.endsWith(`${estudianteId}/`))
+          .map((t) => ({
+            ...t,
+            id: t.url.split("/").filter(Boolean).pop(), // Extrae el id del final de la url
+          }));
+      } catch (error) {
+        this.error =
+          "Error al cargar los datos del estudiante o números telefónicos.";
+        console.error(error);
+      } finally {
+        this.loading = false;
+      }
+    },
     editarEstudiante() {
       this.$router.push({
         name: "EditarEstudiante",
-        params: { estudianteUrl: this.estudiante.url },
+        params: { estudianteUrl: this.estudianteUrl },
       });
     },
     async eliminarEstudiante() {
-      if (confirm("¿Eliminar este estudiante y todos sus teléfonos?")) {
+      if (
+        confirm(
+          "¿Está seguro que desea eliminar este estudiante y todos sus teléfonos?"
+        )
+      ) {
         try {
-          await api.delete(this.estudiante.url);
+          const url = decodeURIComponent(this.estudianteUrl);
+          await api.delete(url);
           this.$router.push({ name: "EstudiantesList" });
-        } catch (err) {
+        } catch (error) {
           this.error = "Error al eliminar el estudiante.";
+          console.error(error);
         }
       }
     },
-    editarTelefono(telefonoUrl) {
+    editarTelefono(telefonoId) {
+      if (!telefonoId) {
+        alert("ID de teléfono no definido para editar.");
+        return;
+      }
+      const telefonoUrl = encodeURIComponent(`numerosts/${telefonoId}/`);
       this.$router.push({
         name: "EditarTelefono",
-        params: { telefonoUrl },
+        params: { telefonoUrl, estudianteUrl: this.estudianteUrl },
       });
     },
-    async eliminarTelefono(telefonoUrl) {
-      if (confirm("¿Eliminar este número telefónico?")) {
+    async eliminarTelefono(telefonoId) {
+      if (!telefonoId) {
+        alert("ID de teléfono no definido para eliminar.");
+        return;
+      }
+      if (confirm("¿Está seguro que desea eliminar este número telefónico?")) {
         try {
-          await api.delete(telefonoUrl);
+          const url = `numerosts/${telefonoId}/`;
+          await api.delete(url);
           this.numerosTelefonicos = this.numerosTelefonicos.filter(
-            (t) => t.url !== telefonoUrl
+            (t) => t.id !== telefonoId
           );
-        } catch (err) {
+        } catch (error) {
           this.error = "Error al eliminar el teléfono.";
+          console.error(error);
         }
       }
     },

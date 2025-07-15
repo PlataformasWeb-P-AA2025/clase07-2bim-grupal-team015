@@ -29,18 +29,15 @@
           >
             Eliminar
           </button>
-          <router-link
-            :to="{ name: 'AgregarTelefono' }"
-            class="add-phone-button"
-          >
-            Agregar Teléfono
-          </router-link>
         </div>
       </li>
     </ul>
     <p v-else>No hay estudiantes registrados.</p>
     <router-link to="/estudiantes/nuevo" class="add-button">
       Agregar Nuevo Estudiante
+    </router-link>
+    <router-link to="/telefonos/nuevo" class="add-phone-button">
+      Agregar Teléfono
     </router-link>
   </div>
 </template>
@@ -194,12 +191,16 @@ ul {
 }
 
 .add-phone-button {
+  display: block;
+  width: fit-content;
+  margin: 20px auto 0;
+  padding: 10px 20px;
   background-color: #007bff; /* Azul para el botón de agregar teléfono */
   color: white;
-  padding: 5px 10px;
   border-radius: 5px;
   text-decoration: none;
-  transition: background-color 0.3s;
+  text-align: center;
+  transition: background-color 0.3s ease;
 }
 
 .add-phone-button:hover {

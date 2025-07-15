@@ -1,12 +1,12 @@
 import { createRouter, createWebHistory } from "vue-router";
 import HomeView from "../views/HomeView.vue";
-import Login from "../views/Login.vue"; // Componente de login
-import EstudiantesList from "../views/EstudiantesList.vue"; // Componente de lista de estudiantes
-import EstudianteDetail from "../views/EstudianteDetail.vue"; // Componente de detalle de estudiante
-import EditarEstudiante from "../views/EditarEstudiante.vue"; // Componente para editar estudiante
-import EditarTelefono from "../views/EditarTelefono.vue"; // Componente para editar número telefónico
-import AgregarEstudiante from "../views/AgregarEstudiante.vue"; // Componente para agregar estudiante
-import AgregarTelefono from "../views/AgregarTelefono.vue"; // Componente para agregar número de teléfono
+import Login from "../views/Login.vue";
+import EstudiantesList from "../views/EstudiantesList.vue";
+import EstudianteDetail from "../views/EstudianteDetail.vue";
+import EditarEstudiante from "../views/EditarEstudiante.vue";
+import EditarTelefono from "../views/EditarTelefono.vue";
+import AgregarEstudiante from "../views/AgregarEstudiante.vue";
+import AgregarTelefono from "../views/AgregarTelefono.vue";
 
 const routes = [
   {
@@ -23,37 +23,36 @@ const routes = [
     path: "/estudiantes",
     name: "EstudiantesList",
     component: EstudiantesList,
-    meta: { requiresAuth: true }, // Ruta protegida
+    meta: { requiresAuth: true },
   },
   {
-    path: "/estudiantes/detail/:estudianteUrl", // Ruta para ver detalles de un estudiante
+    path: "/estudiantes/detail/:estudianteUrl",
     name: "EstudianteDetail",
     component: EstudianteDetail,
-    props: true, // Pasa el ':estudianteUrl' como una prop al componente EstudianteDetail
-    meta: { requiresAuth: true },
+    props: true,
   },
   {
-    path: "/estudiantes/editar/:estudianteUrl", // Ruta para editar un estudiante
+    path: "/estudiantes/editar/:estudianteUrl",
     name: "EditarEstudiante",
     component: EditarEstudiante,
-    props: true, // Pasa el ':estudianteUrl' como una prop al componente EditarEstudiante
+    props: true,
     meta: { requiresAuth: true },
   },
   {
-    path: "/telefonos/editar/:telefonoUrl/:estudianteUrl", // Ruta para editar un número telefónico
+    path: "/telefonos/editar/:telefonoUrl/:estudianteUrl",
     name: "EditarTelefono",
     component: EditarTelefono,
-    props: true, // Pasa el ':telefonoUrl' y ':estudianteUrl' como props al componente EditarTelefono
+    props: true,
     meta: { requiresAuth: true },
   },
   {
-    path: "/estudiantes/nuevo", // Ruta para agregar un nuevo estudiante
+    path: "/estudiantes/nuevo",
     name: "AgregarEstudiante",
     component: AgregarEstudiante,
     meta: { requiresAuth: true },
   },
   {
-    path: "/telefonos/nuevo", // Ruta para agregar un nuevo número de teléfono
+    path: "/telefonos/nuevo",
     name: "AgregarTelefono",
     component: AgregarTelefono,
     meta: { requiresAuth: true },
@@ -61,14 +60,13 @@ const routes = [
 ];
 
 const router = createRouter({
-  history: createWebHistory(process.env.BASE_URL),
+  history: createWebHistory(), // aquí sin parámetro para evitar error
   routes,
 });
 
-// Guarda de navegación para rutas protegidas
 router.beforeEach((to, from, next) => {
   if (to.meta.requiresAuth && !localStorage.getItem("authToken")) {
-    next("/login"); // Redirige al login si no está autenticado
+    next("/login");
   } else {
     next();
   }

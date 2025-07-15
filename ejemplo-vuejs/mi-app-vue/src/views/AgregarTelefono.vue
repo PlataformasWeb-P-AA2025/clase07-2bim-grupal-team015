@@ -13,16 +13,16 @@
       <div class="form-group">
         <label for="estudiante">Seleccionar Estudiante:</label>
         <select
-          v-model="telefonoData.estudianteUrl"
+          v-model="telefonoData.estudianteId"
           id="estudiante"
           required
           class="form-select"
         >
-          <option value="" disabled selected>Seleccione un estudiante</option>
+          <option value="" disabled>Seleccione un estudiante</option>
           <option
             v-for="estudiante in estudiantes"
-            :key="estudiante.url"
-            :value="estudiante.url"
+            :key="estudiante.id"
+            :value="estudiante.id"
           >
             {{ estudiante.nombre }} {{ estudiante.apellido }} ({{
               estudiante.cedula
@@ -36,7 +36,7 @@
         <input
           type="text"
           id="telefono"
-          v-model="telefonoData.numero"
+          v-model="telefonoData.telefono"
           required
           placeholder="Ejemplo: 0987654321"
           class="form-input"
@@ -51,11 +51,10 @@
           required
           class="form-select"
         >
-          <option value="" disabled selected>Seleccione un tipo</option>
-          <option value="personal">Personal</option>
-          <option value="casa">Casa</option>
-          <option value="trabajo">Trabajo</option>
-          <option value="otro">Otro</option>
+          <option value="" disabled>Seleccione un tipo</option>
+          <option value="publico">Público</option>
+          <option value="semiprivado">Semiprivado</option>
+          <option value="particular">Particular</option>
         </select>
       </div>
 
@@ -86,8 +85,8 @@ export default {
     return {
       estudiantes: [],
       telefonoData: {
-        estudianteUrl: "",
-        numero: "",
+        estudianteId: "",
+        telefono: "",
         tipo: "",
       },
       loading: false,
@@ -104,7 +103,13 @@ export default {
         this.loading = true;
         this.error = null;
         const response = await api.get("estudiantes/");
-        this.estudiantes = response.data.results || response.data;
+        this.estudiantes = response.data.results.map((e) => ({
+          id: e.url.split("/").filter(Boolean).pop(),
+          nombre: e.nombre,
+          apellido: e.apellido,
+          cedula: e.cedula,
+          correo: e.correo,
+        }));
       } catch (err) {
         console.error("Error al cargar estudiantes:", err);
         this.error =
@@ -113,31 +118,38 @@ export default {
         this.loading = false;
       }
     },
+
     async guardarTelefono() {
       try {
         this.saving = true;
         this.error = null;
 
-        // Asegúrate de que la URL de la API sea correcta según tu backend
-        await api.post("telefonos/", {
-          telefono: this.telefonoData.numero,
+        const estudianteUrl = `http://127.0.0.1:8000/api/estudiantes/${this.telefonoData.estudianteId}/`;
+
+        const payload = {
+          estudiante: estudianteUrl,
+          telefono: this.telefonoData.telefono,
           tipo: this.telefonoData.tipo,
-          estudiante: this.telefonoData.estudianteUrl,
-        });
+        };
+
+        await api.post("numerosts/", payload);
 
         this.$router.push({
           name: "EstudianteDetail",
-          params: { estudianteUrl: this.telefonoData.estudianteUrl },
+          params: {
+            estudianteUrl: encodeURIComponent(estudianteUrl),
+          },
         });
       } catch (error) {
         console.error("Error al guardar teléfono:", error);
         this.error =
           error.response?.data?.message ||
-          "Error al guardar el teléfono. Verifique los datos.";
+          "Error al guardar el teléfono. Verifique los datos ingresados.";
       } finally {
         this.saving = false;
       }
     },
+
     cancelar() {
       this.$router.go(-1);
     },
